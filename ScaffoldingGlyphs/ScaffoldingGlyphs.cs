@@ -14,7 +14,7 @@ namespace ScaffoldingGlyphs;
 //using Permissions = enum_149;
 //using BondType = enum_126;
 //using BondSite = class_222;
-//using AtomTypes = class_175;
+using AtomTypes = class_175;
 //using PartTypes = class_191;
 using Texture = class_256;
 
@@ -22,7 +22,6 @@ public class MainClass : QuintessentialMod
 {
 	public static MethodInfo PrivateMethod<T>(string method) => typeof(T).GetMethod(method, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 
-	static Texture scaffoldBase, scaffoldLighting;
 
 
 
@@ -32,13 +31,10 @@ public class MainClass : QuintessentialMod
 	}
 	public override void LoadPuzzleContent()
 	{
-		string path = "scaffolding/textures/parts/scaffold/";
+		//
 
-		scaffoldBase = class_235.method_615(path + "base");
-		scaffoldLighting = class_235.method_615(path + "lighting");
-
-
-
+		API.AddScaffold(AtomTypes.field_1689, 1, "repeat", "", API.descriptionBase + " This variant spawns an atom sheathed in [REDACTED].");
+		API.AddScaffold(AtomTypes.field_1675, 5); // salt
 
 
 
