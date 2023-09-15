@@ -52,7 +52,7 @@ public static class API
 	/// SUMMARY
 	/// </summary>
 	/// <param name="argument">restriction</param>
-	public static void AddScaffold(AtomType atomType, int cost)
+	public static void AddScaffold(AtomType atomType, int cost, Texture symbol = null)
 	{
 		var atomNames = atomType.field_2286;
 		if (atomNames == null)
@@ -62,7 +62,7 @@ public static class API
 		}
 		string atomName = atomNames.field_2598[Language.English];
 		string saveIDsuffix = atomName.ToLower();
-		AddScaffold(atomType, cost, saveIDsuffix, atomName);
+		AddScaffold(atomType, cost, saveIDsuffix, atomName, null, symbol);
 	}
 
 	public static void AddScaffold(AtomType atomType, int cost, string saveIDsuffix, string atomName, string description = null, Texture symbol = null, Texture trayIcon = null, Texture trayHoverIcon = null)
@@ -116,12 +116,12 @@ public static class API
 			// marker details
 			vector2 = (symbol.field_2056.ToVector2() / 2).Rounded() + new Vector2(0.0f, 1f);
 			renderer.method_521(symbol, vector2);
-			//// if simulation is NOT running, draw atom
-			//if (editor.method_503() == enum_128.Stopped)
-			//{
-			//	class_236 class236 = editor.method_1989(part, pos);
-			//	Editor.method_925(Molecule.method_1121(atomType), class236.field_1984, new HexIndex(0, 0), class236.field_1985, 1f, 1f, 1f, false, editor);
-			//}
+			// if simulation is NOT running, draw atom
+			if (editor.method_503() == enum_128.Stopped)
+			{
+				class_236 class236 = editor.method_1989(part, pos);
+				Editor.method_925(Molecule.method_1121(atomType), class236.field_1984, new HexIndex(0, 0), class236.field_1985, 1f, 1f, 1f, false, editor);
+			}
 		};
 		
 	}
