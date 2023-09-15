@@ -48,6 +48,8 @@ public static class API
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	// public functions
 
+	public static IReadOnlyDictionary<PartType, AtomType> getScaffoldDictionary() => scaffoldDictionary;
+
 	/// <summary>
 	/// SUMMARY
 	/// </summary>

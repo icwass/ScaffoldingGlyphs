@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace ScaffoldingGlyphs;
 
-//using PartType = class_139;
+using PartType = class_139;
 //using Permissions = enum_149;
 //using BondType = enum_126;
 //using BondSite = class_222;
@@ -22,6 +22,8 @@ public class MainClass : QuintessentialMod
 {
 	public static MethodInfo PrivateMethod<T>(string method) => typeof(T).GetMethod(method, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 
+	private static IDetour hook_Sim_method_1828;
+	private delegate void orig_Sim_method_1828(Sim sim); //code that runs every cycle but before parts are processed
 
 
 
@@ -53,33 +55,36 @@ public class MainClass : QuintessentialMod
 		API.AddScaffold(AtomTypes.field_1686, 160, class_235.method_615(path + "gold"));
 
 
-
-
-
-
-	}
-	public override void Unload()
-	{
-		//
 	}
 	public override void PostLoad()
 	{
-		//
+		hook_Sim_method_1828 = new Hook(PrivateMethod<Sim>("method_1828"), OnSimMethod1828_SpawnScaffolds);
+	}
+	public override void Unload()
+	{
+		hook_Sim_method_1828.Dispose();
 	}
 
-
-
-
-	public PartRenderer scaffoldRenderer(Texture Base, Texture Lighting, Texture Details)
+	private static void OnSimMethod1828_SpawnScaffolds(orig_Sim_method_1828 orig, Sim sim)
 	{
-		return (part, pos, editor, renderer) =>
+		orig(sim);
+		if (sim.method_1818() == 0)//run once at the start of simulation, before arms execute grabs
 		{
-			Vector2 vector2 = (Base.field_2056.ToVector2() / 2).Rounded() + new Vector2(0.0f, 1f);
-			renderer.method_521(Base, vector2);
-			/*marker_lighting*/
-			renderer.method_528(Lighting, new HexIndex(0, 0), Vector2.Zero);
-			/*marker_details*/
-			renderer.method_521(Details, vector2);
-		};
+			var partDict = sim.field_3821;
+			var scaffoldDict = API.getScaffoldDictionary();
+			var molecules = sim.field_3823;
+
+			foreach (var part in partDict.Keys)
+			{
+				var partType = part.method_1159();
+				if (scaffoldDict.ContainsKey(partType))
+				{
+					var atomType = scaffoldDict[partType];
+					var scaffold = new Molecule();
+					scaffold.method_1105(new Atom(atomType), part.method_1184(new HexIndex(0, 0)));
+					molecules.Add(scaffold);
+				}
+			}
+		}
 	}
 }
