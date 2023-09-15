@@ -1,0 +1,11 @@
+Name: ScaffoldingGlyphs
+Version: 0.0.1
+Icon: scaffolding/mod_icon
+Title: Scaffolding Glyphs
+Desc: A mod that introduces Scaffolding glyphs.
+DLL: "ScaffoldingGlyphs/bin/Debug/net452/ScaffoldingGlyphs.dll"
+Dependencies:
+- Name: Quintessential
+  Version: 0.4.0
+#OptionalDependencies
+#Mappings:
