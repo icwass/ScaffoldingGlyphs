@@ -36,23 +36,36 @@ public class MainClass : QuintessentialMod
 		//
 
 		string path = "scaffolding/textures/parts/scaffold/";
+		string iconpath = "scaffolding/textures/parts/icons/scaffold/";
 
-		API.AddScaffold(AtomTypes.field_1689,   1, "repeat", "", API.descriptionBase + " This variant spawns an atom sheathed in [REDACTED].", class_235.method_615(path + "repeat"));
-		API.AddScaffold(AtomTypes.field_1675,   5, class_235.method_615(path + "salt"));
-		API.AddScaffold(AtomTypes.field_1676,  10, class_235.method_615(path + "air"));
-		API.AddScaffold(AtomTypes.field_1679,  10, class_235.method_615(path + "water"));
-		API.AddScaffold(AtomTypes.field_1678,  10, class_235.method_615(path + "fire"));
-		API.AddScaffold(AtomTypes.field_1677,  10, class_235.method_615(path + "earth"));
-		API.AddScaffold(AtomTypes.field_1687,  10, class_235.method_615(path + "vitae"));
-		API.AddScaffold(AtomTypes.field_1688,  10, class_235.method_615(path + "mors"));
-		API.AddScaffold(AtomTypes.field_1690,  40, class_235.method_615(path + "quintessence"));
-		API.AddScaffold(AtomTypes.field_1680,   5, class_235.method_615(path + "quicksilver"));
-		API.AddScaffold(AtomTypes.field_1681,   5, class_235.method_615(path + "lead"));
-		API.AddScaffold(AtomTypes.field_1683,  10, class_235.method_615(path + "tin"));
-		API.AddScaffold(AtomTypes.field_1684,  20, class_235.method_615(path + "iron"));
-		API.AddScaffold(AtomTypes.field_1682,  40, class_235.method_615(path + "copper"));
-		API.AddScaffold(AtomTypes.field_1685,  80, class_235.method_615(path + "silver"));
-		API.AddScaffold(AtomTypes.field_1686, 160, class_235.method_615(path + "gold"));
+		string repeatDesc = API.descriptionBase + " This variant spawns an atom sheathed in [REDACTED].";
+
+		API.AddScaffold(AtomTypes.field_1689, 1, "repeat", "", repeatDesc, class_235.method_615(path + "repeat"), class_235.method_615(iconpath + "repeat"), class_235.method_615(iconpath + "repeat_hover"));
+
+		List<Tuple<AtomType, int, string>> vanillaScaffolds = new()
+		{
+			Tuple.Create(AtomTypes.field_1675,   5, "salt"),
+			Tuple.Create(AtomTypes.field_1676,  10, "air"),
+			Tuple.Create(AtomTypes.field_1679,  10, "water"),
+			Tuple.Create(AtomTypes.field_1678,  10, "fire"),
+			Tuple.Create(AtomTypes.field_1677,  10, "earth"),
+			Tuple.Create(AtomTypes.field_1687,  10, "vitae"),
+			Tuple.Create(AtomTypes.field_1688,  10, "mors"),
+			Tuple.Create(AtomTypes.field_1690,  40, "quintessence"),
+			Tuple.Create(AtomTypes.field_1680,   5, "quicksilver"),
+			Tuple.Create(AtomTypes.field_1681,   5, "lead"),
+			Tuple.Create(AtomTypes.field_1683,  10, "tin"),
+			Tuple.Create(AtomTypes.field_1684,  20, "iron"),
+			Tuple.Create(AtomTypes.field_1682,  40, "copper"),
+			Tuple.Create(AtomTypes.field_1685,  80, "silver"),
+			Tuple.Create(AtomTypes.field_1686, 160, "gold"),
+		};
+
+		foreach (var scaffold in vanillaScaffolds)
+		{
+			string id = scaffold.Item3;
+			API.AddScaffold(scaffold.Item1, scaffold.Item2, path + id, iconpath + id, iconpath + id + "_hover");
+		}
 
 
 	}

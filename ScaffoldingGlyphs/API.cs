@@ -54,7 +54,14 @@ public static class API
 	/// SUMMARY
 	/// </summary>
 	/// <param name="argument">restriction</param>
-	public static void AddScaffold(AtomType atomType, int cost, Texture symbol = null)
+	public static void AddScaffold(AtomType atomType, int cost, string symbolFilepath = null, string iconPath = null, string hoverPath = null)
+	{
+		Texture symbol = symbolFilepath == null ? null : class_235.method_615(symbolFilepath);
+		Texture icon = iconPath == null ? null : class_235.method_615(iconPath);
+		Texture hover = hoverPath == null ? null : class_235.method_615(hoverPath);
+		AddScaffold(atomType, cost, symbol, icon, hover);
+	}
+	public static void AddScaffold(AtomType atomType, int cost, Texture symbol = null, Texture icon = null, Texture hover = null)
 	{
 		var atomNames = atomType.field_2286;
 		if (atomNames == null)
@@ -64,10 +71,20 @@ public static class API
 		}
 		string atomName = atomNames.field_2598[Language.English];
 		string saveIDsuffix = atomName.ToLower();
-		AddScaffold(atomType, cost, saveIDsuffix, atomName, null, symbol);
+
+		AddScaffold(atomType, cost, saveIDsuffix, atomName, null, symbol, icon, hover);
 	}
 
-	public static void AddScaffold(AtomType atomType, int cost, string saveIDsuffix, string atomName, string description = null, Texture symbol = null, Texture trayIcon = null, Texture trayHoverIcon = null)
+	public static void AddScaffold(
+		AtomType atomType,
+		int cost,
+		string saveIDsuffix,
+		string atomName,
+		string description = null,
+		Texture symbol = null,
+		Texture trayIcon = null,
+		Texture trayHoverIcon = null
+	)
 	{
 		if (description == null) description = scaffoldDescription(atomName);
 		if (trayIcon == null) trayIcon = class_238.field_1989.field_97.field_382; // single-hex glow
