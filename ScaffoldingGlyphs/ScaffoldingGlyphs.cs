@@ -15,7 +15,7 @@ using PartType = class_139;
 //using BondType = enum_126;
 //using BondSite = class_222;
 using AtomTypes = class_175;
-//using PartTypes = class_191;
+using PartTypes = class_191;
 using Texture = class_256;
 
 public class MainClass : QuintessentialMod
@@ -72,7 +72,24 @@ public class MainClass : QuintessentialMod
 	public override void PostLoad()
 	{
 		hook_Sim_method_1828 = new Hook(PrivateMethod<Sim>("method_1828"), OnSimMethod1828_SpawnScaffolds);
+		On.SolutionEditorPartsPanel.class_428.method_2047 += method_2047_AddScaffoldTray; ;
 	}
+
+	private void method_2047_AddScaffoldTray(On.SolutionEditorPartsPanel.class_428.orig_method_2047 orig, SolutionEditorPartsPanel.class_428 class428_self, string trayName, List<PartTypeForToolbar> list)
+	{
+		orig(class428_self, trayName, list);
+		if (trayName != class_134.method_253("Glyphs", string.Empty)) return;
+
+		//append Debugging Tray
+		List<PartTypeForToolbar> toolbarList = new List<PartTypeForToolbar>();
+
+		foreach (var scaffoldParttype in API.getScaffoldDictionary().Keys)
+		{
+			toolbarList.Add(PartTypeForToolbar.method_1225(scaffoldParttype, true, true));
+		}
+		orig(class428_self, class_134.method_253("Scaffolding Glyphs", string.Empty), toolbarList);
+	}
+
 	public override void Unload()
 	{
 		hook_Sim_method_1828.Dispose();

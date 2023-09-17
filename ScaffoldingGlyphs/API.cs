@@ -117,10 +117,7 @@ public static class API
 		};
 
 		scaffoldDictionary.Add(scaffold, atomType);
-
-		//eventually add part to part dictionary myself to bypass Quintessential not letting me use it in vanilla puzzles
 		QApi.AddPartType(scaffold, scaffoldRenderer(atomType, symbol));
-		QApi.AddPartTypeToPanel(scaffold, PartTypes.field_1782);
 	}
 
 	private static PartRenderer scaffoldRenderer(AtomType atomType, Texture symbol)
