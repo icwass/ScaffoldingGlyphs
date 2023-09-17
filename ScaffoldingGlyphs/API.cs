@@ -15,8 +15,8 @@ using PartType = class_139;
 using Permissions = enum_149;
 //using BondType = enum_126;
 //using BondSite = class_222;
-using AtomTypes = class_175;
-using PartTypes = class_191;
+//using AtomTypes = class_175;
+//using PartTypes = class_191;
 using Texture = class_256;
 public static class API
 {

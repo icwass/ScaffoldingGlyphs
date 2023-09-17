@@ -7,5 +7,6 @@ DLL: "ScaffoldingGlyphs/bin/Debug/net452/ScaffoldingGlyphs.dll"
 Dependencies:
 - Name: Quintessential
   Version: 0.4.0
-#OptionalDependencies
-#Mappings:
+OptionalDependencies:
+- Name: FTSIGCTU
+  Version: 0.5.0

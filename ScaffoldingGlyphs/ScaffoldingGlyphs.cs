@@ -10,13 +10,13 @@ using System.Reflection;
 
 namespace ScaffoldingGlyphs;
 
-using PartType = class_139;
+//using PartType = class_139;
 //using Permissions = enum_149;
 //using BondType = enum_126;
 //using BondSite = class_222;
 using AtomTypes = class_175;
-using PartTypes = class_191;
-using Texture = class_256;
+//using PartTypes = class_191;
+//using Texture = class_256;
 
 public class MainClass : QuintessentialMod
 {
@@ -58,7 +58,6 @@ public class MainClass : QuintessentialMod
 
 		foreach (var scaffold in vanillaScaffolds)
 		{
-			string id = scaffold.Item3;
 			API.AddScaffold(scaffold.Item1, scaffold.Item2);
 		}
 	}
@@ -67,6 +66,20 @@ public class MainClass : QuintessentialMod
 	{
 		hook_Sim_method_1828 = new Hook(PrivateMethod<Sim>("method_1828"), OnSimMethod1828_SpawnScaffolds);
 		On.SolutionEditorPartsPanel.class_428.method_2047 += method_2047_AddScaffoldTray;
+		
+		//optional dependencies
+		if (QuintessentialLoader.CodeMods.Any(mod => mod.Meta.Name == "FTSIGCTU"))
+		{
+			Logger.Log("[ScaffoldingGlyphs] Detected optional dependency 'FTSIGCTU' - adding mirror rules for parts.");
+			foreach (var scaffold in API.getScaffoldDictionary().Keys)
+			{
+				FTSIGCTU.MirrorTool.addRule(scaffold, FTSIGCTU.MirrorTool.mirrorSingleton);
+			}
+		}
+		else
+		{
+			Logger.Log("[ScaffoldingGlyphs] Did not detect optional dependency 'FTSIGCTU'.");
+		}
 	}
 
 	private void method_2047_AddScaffoldTray(On.SolutionEditorPartsPanel.class_428.orig_method_2047 orig, SolutionEditorPartsPanel.class_428 class428_self, string trayName, List<PartTypeForToolbar> list)
