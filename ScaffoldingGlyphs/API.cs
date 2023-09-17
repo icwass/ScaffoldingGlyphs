@@ -4,6 +4,7 @@ using Quintessential;
 using Quintessential.Settings;
 using SDL2;
 using System;
+using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
@@ -61,7 +62,7 @@ public static class API
 		Texture hover = hoverPath == null ? null : class_235.method_615(hoverPath);
 		AddScaffold(atomType, cost, symbol, icon, hover);
 	}
-	public static void AddScaffold(AtomType atomType, int cost, Texture symbol = null, Texture icon = null, Texture hover = null)
+	public static void AddScaffold(AtomType atomType, int cost, Texture symbol, Texture icon = null, Texture hover = null)
 	{
 		var atomNames = atomType.field_2286;
 		if (atomNames == null)
@@ -87,13 +88,15 @@ public static class API
 	)
 	{
 		if (description == null) description = scaffoldDescription(atomName);
-		if (trayIcon == null) trayIcon = class_238.field_1989.field_97.field_382; // single-hex glow
-		if (trayHoverIcon == null) trayHoverIcon = class_238.field_1989.field_97.field_383; // single-hex stroke
 		if (symbol == null)
 		{
-			symbol = atomType.field_2287;
-			//at some point, construct symbol from atomType.field_2287 via monochrome
+			symbol = generateSymbolFromAtomtype(atomType);
 		}
+		if (trayIcon == null) trayIcon = generateTrayIcon(symbol, false);
+		if (trayHoverIcon == null) trayHoverIcon = generateTrayIcon(symbol, true); // single-hex stroke
+
+		//trayIcon = generateTrayIcon(atomType.field_2287);
+		//trayHoverIcon = generateTrayIcon(atomType.field_2287, true);
 
 		if (atomName != "") atomName += " ";
 
@@ -130,16 +133,97 @@ public static class API
 			// marker lighting
 			renderer.method_528(fetchScaffoldLightingTexture(), new HexIndex(0, 0), Vector2.Zero);
 			// marker details
-			vector2 = (symbol.field_2056.ToVector2() / 2).Rounded() + new Vector2(0.0f, 1f);
+			vector2 = (symbol.field_2056.ToVector2() / 2).Rounded() + new Vector2(0f, 1f);
 			renderer.method_521(symbol, vector2);
 			// if simulation is NOT running, draw atom
 			if (editor.method_503() == enum_128.Stopped)
 			{
 				class_236 class236 = editor.method_1989(part, pos);
-				Editor.method_925(Molecule.method_1121(atomType), class236.field_1984, new HexIndex(0, 0), class236.field_1985, 1f, 1f, 1f, false, editor);
+				//Editor.method_925(Molecule.method_1121(atomType), class236.field_1984, new HexIndex(0, 0), class236.field_1985, 1f, 1f, 1f, false, editor);
 			}
 		};
 		
+	}
+
+	static byte[] modifiedPixels(byte[] pixelData, Func<float, float, float, float, Tuple<float, float, float, float>> pixelTransformer)
+	{
+		if (pixelData.Length % 4 != 0) return pixelData;
+
+		byte[] newPixelData = new byte[pixelData.Length];
+
+		for (int k = 0; k < newPixelData.Length; k += 4)
+		{
+			var newPixel = pixelTransformer(pixelData[k + 0] / 255f, pixelData[k + 1] / 255f, pixelData[k + 2] / 255f, pixelData[k + 3] / 255f);
+			newPixelData[k + 0] = (byte)(newPixel.Item1 * 255f);
+			newPixelData[k + 1] = (byte)(newPixel.Item2 * 255f);
+			newPixelData[k + 2] = (byte)(newPixel.Item3 * 255f);
+			newPixelData[k + 3] = (byte)(newPixel.Item4 * 255f);
+		}
+		return newPixelData;
+	}
+	static byte[] copyPixels(byte[] pixelData) => modifiedPixels(pixelData, (r, g, b, a) => Tuple.Create(r, g, b, a));
+
+
+
+	private static Texture generateSymbolFromAtomtype(AtomType atomType)
+	{
+		RenderTargetHandle renderTargetHandle = new RenderTargetHandle();
+		// draw in the target
+		Texture symbol = atomType.field_2287;
+		Vector2 pos = new Vector2(-1f, 1f);
+		renderTargetHandle.field_2987 = symbol.field_2056;
+		class_95 class95 = renderTargetHandle.method_1352(out _);
+		using (class_226.method_597(class95, Matrix4.method_1074(new Vector3(1, 1, 1))))
+		{
+			class_226.method_600(Color.Transparent);
+			class_135.method_272(symbol, pos);
+		}
+
+		// extract resulting image from target
+		class_272 class272 = Renderer.method_1313(renderTargetHandle.method_1351().field_937);
+		byte[] newBytes = modifiedPixels(class272.field_2126, (r,g,b,a) =>
+		{
+			float gray = (0.299f * r + 0.587f * g + 0.114f * b) / 8f;
+			return Tuple.Create(gray, gray, gray, a * a * a);
+		});
+		class_272 newclass272 = new class_272(class272.field_2123, class272.field_2124, newBytes);
+		//debug save-to-file
+		//string outDir = Path.Combine("ScaffoldingTemp", "DumpedAtomSprites");
+		//Directory.CreateDirectory(outDir);
+		//string path = Path.Combine(outDir, "image_" + counter++);
+		//class272.method_735(path + "_1.png");
+		//newclass272.method_735(path + "_2.png");
+		return Renderer.method_1310(newclass272);
+	}
+
+	private static Texture generateTrayIcon(Texture texSymbol, bool drawHover = false)
+	{
+		RenderTargetHandle renderTargetHandle = new RenderTargetHandle();
+		// draw in the target
+		Index2 index2 = new Index2(182, 184);
+		Texture texBase = fetchScaffoldBaseTexture();
+		Texture texLight = fetchScaffoldLightingTexture();
+		Texture texHover = class_238.field_1989.field_90.field_245.field_307;
+
+		Vector2 center = index2.ToVector2() / 2;
+		Vector2 offset(Texture texture) => (center - texture.field_2056.ToVector2() / 2).Rounded();
+
+		renderTargetHandle.field_2987 = index2;
+		class_95 class95 = renderTargetHandle.method_1352(out _);
+		using (class_226.method_597(class95, Matrix4.method_1074(new Vector3(1, 1, 1))))
+		{
+			class_226.method_600(Color.Transparent);
+			if (drawHover) class_135.method_272(texHover, offset(texHover));
+			class_135.method_272(texBase, offset(texBase));
+			class_135.method_272(texLight, offset(texLight));
+			class_135.method_272(texSymbol, offset(texSymbol) - new Vector2(-1f, 1f));
+		}
+
+		// extract resulting image from target
+		class_272 class272 = Renderer.method_1313(renderTargetHandle.method_1351().field_937);
+		byte[] newBytes = copyPixels(class272.field_2126);
+		class_272 newclass272 = new class_272(class272.field_2123, class272.field_2124, newBytes);
+		return Renderer.method_1310(newclass272);
 	}
 
 }

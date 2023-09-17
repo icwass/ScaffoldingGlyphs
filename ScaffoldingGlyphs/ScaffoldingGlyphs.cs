@@ -33,14 +33,9 @@ public class MainClass : QuintessentialMod
 	}
 	public override void LoadPuzzleContent()
 	{
-		//
-
 		string path = "scaffolding/textures/parts/scaffold/";
-		string iconpath = "scaffolding/textures/parts/icons/scaffold/";
-
 		string repeatDesc = API.descriptionBase + " This variant spawns an atom sheathed in [REDACTED].";
-
-		API.AddScaffold(AtomTypes.field_1689, 1, "repeat", "", repeatDesc, class_235.method_615(path + "repeat"), class_235.method_615(iconpath + "repeat"), class_235.method_615(iconpath + "repeat_hover"));
+		API.AddScaffold(AtomTypes.field_1689, 1, "repeat", "", repeatDesc, class_235.method_615(path + "repeat"));
 
 		List<Tuple<AtomType, int, string>> vanillaScaffolds = new()
 		{
@@ -64,15 +59,14 @@ public class MainClass : QuintessentialMod
 		foreach (var scaffold in vanillaScaffolds)
 		{
 			string id = scaffold.Item3;
-			API.AddScaffold(scaffold.Item1, scaffold.Item2, path + id, iconpath + id, iconpath + id + "_hover");
+			API.AddScaffold(scaffold.Item1, scaffold.Item2);
 		}
-
-
 	}
+
 	public override void PostLoad()
 	{
 		hook_Sim_method_1828 = new Hook(PrivateMethod<Sim>("method_1828"), OnSimMethod1828_SpawnScaffolds);
-		On.SolutionEditorPartsPanel.class_428.method_2047 += method_2047_AddScaffoldTray; ;
+		On.SolutionEditorPartsPanel.class_428.method_2047 += method_2047_AddScaffoldTray;
 	}
 
 	private void method_2047_AddScaffoldTray(On.SolutionEditorPartsPanel.class_428.orig_method_2047 orig, SolutionEditorPartsPanel.class_428 class428_self, string trayName, List<PartTypeForToolbar> list)
